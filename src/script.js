@@ -39,6 +39,20 @@ const normalTexture = textureLoader.load('/textures/door/normal.jpg')
 const ambientOcclusionTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg')
 const metalnessTexture = textureLoader.load('/textures/door/metalness.jpg')
 const roughnessTexture = textureLoader.load('/textures/door/roughness.jpg')
+const gradientTexture = textureLoader.load('/textures/gradients/3.jpg')
+const doorAlphaTexture = textureLoader.load('/textures/door/alpha.jpg')
+
+const matcapTexture = textureLoader.load('/textures/matcaps/1.png')
+// const matcapTexture = textureLoader.load('/textures/matcaps/3.png')
+// const matcapTexture = textureLoader.load('/textures/matcaps/4.png')
+// const matcapTexture = textureLoader.load('/textures/matcaps/5.png')
+// const matcapTexture = textureLoader.load('/textures/matcaps/6.png')
+// const matcapTexture = textureLoader.load('/textures/matcaps/7.png')
+// const matcapTexture = textureLoader.load('/textures/matcaps/8.png')
+
+const material = new THREE.MeshMatcapMaterial()
+material.matcap = matcapTexture
+
 
 const parameters = {
     color: 0xff0000,
@@ -52,11 +66,36 @@ const scene = new THREE.Scene()
 
 
 const geometry = new THREE.BoxGeometry(1, 1, 1)
-const material = new THREE.MeshBasicMaterial({ map: colorTexture })
+const materialLam = new THREE.MeshLambertMaterial()
+const materialToon = new THREE.MeshToonMaterial()
+materialToon.gradientMap = gradientTexture
 
-const mesh = new THREE.Mesh(geometry, material)
-mesh.position.set(0.7, 0, 0.5)
-scene.add(mesh)
+// const matcapTexture = new THREE.MeshMatcapMaterial()
+// const material = new THREE.MeshNormalMaterial()
+// material.transparent = true
+// material.opacity = 0.5
+material.flatShading = true
+material.alphaMap = doorAlphaTexture
+// material.side = THREE.DoubleSide
+material.matcap = matcapTexture
+const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 16, 16),
+    material
+)
+sphere.position.x = - 1.5
+
+const plane = new THREE.Mesh(
+    new THREE.PlaneGeometry(1, 1),
+    materialLam
+)
+
+const torus = new THREE.Mesh(
+    new THREE.TorusGeometry(0.3, 0.2, 16, 32),
+    materialToon
+)
+torus.position.x = 1.5
+
+scene.add(sphere, plane, torus)
 
 
 // Sizes
@@ -68,7 +107,7 @@ const sizes = {
 // Camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
 camera.position.z = 3
-camera.lookAt(mesh.position)
+// camera.lookAt(mesh.position)
 scene.add(camera)
 
 
@@ -92,12 +131,19 @@ const cursor = {
 const clock = new THREE.Clock()
 const tick = () =>
 {
-    // const elapsedTime = clock.getElapsedTime()
+    const elapsedTime = clock.getElapsedTime()
 
     // camera.position.x = Math.sin(cursor.x * Math.PI * 2) * 2
     // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 2
     // camera.position.y = cursor.y * 3
-    camera.lookAt(mesh.position)
+    // camera.lookAt(mesh.position)
+    sphere.rotation.y = 0.1 * elapsedTime
+    plane.rotation.y = 0.1 * elapsedTime
+    torus.rotation.y = 0.1 * elapsedTime
+
+    sphere.rotation.x = 0.15 * elapsedTime
+    plane.rotation.x = 0.15 * elapsedTime
+    torus.rotation.x = 0.15 * elapsedTime
     controls.update()
     renderer.render(scene, camera)
     window.requestAnimationFrame(tick)
@@ -105,6 +151,14 @@ const tick = () =>
 
 tick()
 
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+scene.add(ambientLight)
+const pointLight = new THREE.PointLight(0xffffff, 0.5)
+pointLight.position.x = 2
+pointLight.position.y = 3
+pointLight.position.z = 4
+scene.add(pointLight)
 
 window.addEventListener('mousemove', (event) =>
 {
@@ -154,9 +208,9 @@ window.addEventListener('dblclick', () =>
 
 // Debug
 const gui = new dat.GUI()
-gui.add(mesh.position, 'y').min(- 3).max(3).step(0.01).name('elevation')
-gui.add(mesh, 'visible')
-gui.add(material, 'wireframe')
+// gui.add(mesh.position, 'y').min(- 3).max(3).step(0.01).name('elevation')
+// gui.add(mesh, 'visible')
+// gui.add(material, 'wireframe')
 gui.addColor(parameters, 'color')    
     .onChange(() =>
     {
