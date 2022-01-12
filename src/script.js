@@ -2,20 +2,25 @@ import './style.css'
 import * as THREE from 'three'
 import gsap from 'gsap'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import * as dat from 'lil-gui'
+
+
+
+
+const parameters = {
+    color: 0xff0000,
+    spin: () =>
+    {
+        gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + Math.PI * 2 })
+    }
+}
 
 const scene = new THREE.Scene()
 
 
-// const geometry = new THREE.SphereGeometry(1, 32, 32) // sphere object
-const geometry = new THREE.BufferGeometry()
-const positionsArray = new Float32Array([
-    0, 0, 0, // First vertex
-    0, 1, 0, // Second vertex
-    1, 0, 0  // Third vertex
-])
-const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3)
-geometry.setAttribute('position', positionsAttribute)
-const material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
+const geometry = new THREE.BoxGeometry(1, 1, 1)
+const material = new THREE.MeshBasicMaterial({ color: parameters.color })
+
 const mesh = new THREE.Mesh(geometry, material)
 mesh.position.set(0.7, 0, 0.5)
 scene.add(mesh)
@@ -112,3 +117,17 @@ window.addEventListener('dblclick', () =>
         }
     }
 })
+
+
+// Debug
+const gui = new dat.GUI()
+gui.add(mesh.position, 'y').min(- 3).max(3).step(0.01).name('elevation')
+gui.add(mesh, 'visible')
+gui.add(material, 'wireframe')
+gui.addColor(parameters, 'color')    
+    .onChange(() =>
+    {
+        material.color.set(parameters.color)
+    })
+gui.add(parameters, 'spin')
+    
