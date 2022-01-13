@@ -27,6 +27,16 @@ pointLight.position.y = 3
 pointLight.position.z = 4
 scene.add(pointLight)
 
+const directionalLight = new THREE.DirectionalLight(0x00fffc, 0.3)
+directionalLight.position.set(1, 0.25, 0)
+scene.add(directionalLight)
+
+const pointLight2 = new THREE.PointLight(0xff9000, 0.5, 10, 2)
+scene.add(pointLight2)
+
+const spotLight = new THREE.SpotLight(0x78ff00, 0.5, 10, Math.PI * 0.1, 0.25, 1)
+spotLight.position.set(0, 2, 3)
+scene.add(spotLight)
 /**
  * Objects
  */
